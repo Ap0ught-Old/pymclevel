@@ -33,3 +33,4 @@ doc/_build
 # PyCharm local
 .idea/misc.xml
 .idea/py3mclevel.iml
+.idea/workspace.xml
