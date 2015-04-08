@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-"""
+'''
 MCLevel interfaces
 
 Sample usage:
@@ -16,12 +16,12 @@ import mclevel
 #   Can accept a path to the world folder or a path to the level.dat.  Returns an MCInfdevOldLevel
 
 # Load a Classic level.
-level = mclevel.fromFile("server_level.dat");
+level = mclevel.fromFile('server_level.dat');
 
 # fromFile identified the file type and returned a MCJavaLevel.  MCJavaLevel doesn't actually know any java. It guessed the
 # location of the Blocks array by starting at the end of the file and moving backwards until it only finds valid blocks.
 # It also doesn't know the dimensions of the level.  This is why you have to tell them to MCEdit via the filename.
-# This works here too:  If the file were 512 wide, 512 long, and 128 high, I'd have to name it "server_level_512_512_128.dat"
+# This works here too:  If the file were 512 wide, 512 long, and 128 high, I'd have to name it 'server_level_512_512_128.dat'
 #
 # This is one area for improvement.
 
@@ -32,11 +32,11 @@ blocks = level.Blocks
 blocks[blocks == level.materials.Sand.ID] = level.materials.Glass.ID
 
 # Save the file with another name.  This only works for non-Alpha levels.
-level.saveToFile("server_level_glassy.dat");
+level.saveToFile('server_level_glassy.dat');
 
 # Load an Alpha world
 # Loading an Alpha world immediately scans the folder for chunk files.  This takes longer for large worlds.
-ourworld = mclevel.fromFile("C:\\Minecraft\\OurWorld");
+ourworld = mclevel.fromFile('C:\\Minecraft\\OurWorld');
 
 # Convenience method to load a numbered world from the saves folder.
 world1 = mclevel.loadWorldNumber(1);
@@ -67,11 +67,11 @@ chunk.Blocks[0,0,64] = 1
 
 # Entities usually have Pos, Health, and id
 # TileEntities usually have tileX, tileY, tileZ, and id
-# For more information, google "Chunk File Format"
+# For more information, google 'Chunk File Format'
 
 for entity in chunk.Entities:
-    if entity["id"].value == "Spider":
-        entity["Health"].value = 50
+    if entity['id'].value == 'Spider':
+        entity['Health'].value = 50
 
 
 # Accessing one byte at a time from the Blocks array is very slow in Python.
@@ -168,7 +168,7 @@ def fillBlocks(self, box, blockType, blockData = 0):
 
 
 Copyright 2010 David Rio Vierra
-"""
+'''
 
 from indev import MCIndevLevel
 from infiniteworld import MCInfdevOldLevel
@@ -193,44 +193,44 @@ def fromFile(filename, loadInfinite=True, readonly=False):
     ''' The preferred method for loading Minecraft levels of any type.
     pass False to loadInfinite if you'd rather not load infdev levels.
     '''
-    log.info(u"Identifying " + filename)
+    log.info('Identifying ' + filename)
 
     if not filename:
-        raise IOError("File not found: " + filename)
+        raise IOError('File not found: ' + filename)
     if not os.path.exists(filename):
-        raise IOError("File not found: " + filename)
+        raise IOError('File not found: ' + filename)
 
     if ZipSchematic._isLevel(filename):
-        log.info("Zipfile found, attempting zipped infinite level")
+        log.info('Zipfile found, attempting zipped infinite level')
         lev = ZipSchematic(filename)
-        log.info("Detected zipped Infdev level")
+        log.info('Detected zipped Infdev level')
         return lev
 
     if PocketWorld._isLevel(filename):
         return PocketWorld(filename)
 
     if MCInfdevOldLevel._isLevel(filename):
-        log.info(u"Detected Infdev level.dat")
+        log.info('Detected Infdev level.dat')
         if loadInfinite:
             return MCInfdevOldLevel(filename=filename, readonly=readonly)
         else:
-            raise ValueError("Asked to load {0} which is an infinite level, loadInfinite was False".format(os.path.basename(filename)))
+            raise ValueError('Asked to load {0} which is an infinite level, loadInfinite was False'.format(os.path.basename(filename)))
 
     if os.path.isdir(filename):
-        raise ValueError("Folder {0} was not identified as a Minecraft level.".format(os.path.basename(filename)))
+        raise ValueError('Folder {0} was not identified as a Minecraft level.'.format(os.path.basename(filename)))
 
-    f = file(filename, 'rb')
+    f = open(filename, 'rb')
     rawdata = f.read()
     f.close()
     if len(rawdata) < 4:
-        raise ValueError("{0} is too small! ({1}) ".format(filename, len(rawdata)))
+        raise ValueError('{0} is too small! ({1}) '.format(filename, len(rawdata)))
 
     data = fromstring(rawdata, dtype='uint8')
     if not data.any():
-        raise ValueError("{0} contains only zeroes. This file is damaged beyond repair.")
+        raise ValueError('{0} contains only zeroes. This file is damaged beyond repair.')
 
     if MCJavaLevel._isDataLevel(data):
-        log.info(u"Detected Java-style level")
+        log.info('Detected Java-style level')
         lev = MCJavaLevel(filename, data)
         lev.compressed = False
         return lev
@@ -240,8 +240,8 @@ def fromFile(filename, loadInfinite=True, readonly=False):
     unzippedData = None
     try:
         unzippedData = nbt.gunzip(rawdata)
-    except Exception, e:
-        log.info(u"Exception during Gzip operation, assuming {0} uncompressed: {1!r}".format(filename, e))
+    except Exception as e:
+        log.info('Exception during Gzip operation, assuming {0} uncompressed: {1!r}'.format(filename, e))
         if unzippedData is None:
             compressed = False
             unzippedData = rawdata
@@ -249,7 +249,7 @@ def fromFile(filename, loadInfinite=True, readonly=False):
     #data =
     data = unzippedData
     if MCJavaLevel._isDataLevel(data):
-        log.info(u"Detected compressed Java-style level")
+        log.info('Detected compressed Java-style level')
         lev = MCJavaLevel(filename, data)
         lev.compressed = compressed
         return lev
@@ -257,30 +257,30 @@ def fromFile(filename, loadInfinite=True, readonly=False):
     try:
         root_tag = nbt.load(buf=data)
 
-    except Exception, e:
-        log.info(u"Error during NBT load: {0!r}".format(e))
+    except Exception as e:
+        log.info('Error during NBT load: {0!r}'.format(e))
         log.info(traceback.format_exc())
-        log.info(u"Fallback: Detected compressed flat block array, yzx ordered ")
+        log.info('Fallback: Detected compressed flat block array, yzx ordered ')
         try:
             lev = MCJavaLevel(filename, data)
             lev.compressed = compressed
             return lev
-        except Exception, e2:
-            raise LoadingError(("Multiple errors encountered", e, e2), sys.exc_info()[2])
+        except Exception as e2:
+            raise LoadingError(('Multiple errors encountered', e, e2), sys.exc_info()[2])
 
     else:
         if MCIndevLevel._isTagLevel(root_tag):
-            log.info(u"Detected Indev .mclevel")
+            log.info('Detected Indev .mclevel')
             return MCIndevLevel(root_tag, filename)
         if MCSchematic._isTagLevel(root_tag):
-            log.info(u"Detected Schematic.")
+            log.info('Detected Schematic.')
             return MCSchematic(root_tag=root_tag, filename=filename)
 
         if INVEditChest._isTagLevel(root_tag):
-            log.info(u"Detected INVEdit inventory file")
+            log.info('Detected INVEdit inventory file')
             return INVEditChest(root_tag=root_tag, filename=filename)
 
-    raise IOError("Cannot detect file type.")
+    raise IOError('Cannot detect file type.')
 
 
 def loadWorld(name):
@@ -290,5 +290,5 @@ def loadWorld(name):
 
 def loadWorldNumber(i):
     #deprecated
-    filename = u"{0}{1}{2}{3}{1}".format(saveFileDir, os.sep, u"World", i)
+    filename = '{0}{1}{2}{3}{1}'.format(saveFileDir, os.sep, 'World', i)
     return fromFile(filename)

@@ -1,6 +1,3 @@
-
-# vim:set sw=2 sts=2 ts=2:
-
 """
 Named Binary Tag library. Serializes and deserializes TAG_* objects
 to and from binary data. Load a Minecraft level by calling nbt.load().
@@ -24,7 +21,7 @@ import itertools
 import logging
 import struct
 import zlib
-from cStringIO import StringIO
+from io import StringIO, BytesIO
 
 import numpy
 from numpy import array, zeros, fromstring
@@ -64,9 +61,6 @@ class TAG_Value(object):
     tagID = NotImplemented
     data_type = NotImplemented
 
-    _name = None
-    _value = None
-
     @property
     def value(self):
         return self._value
@@ -83,7 +77,7 @@ class TAG_Value(object):
     @name.setter
     def name(self, newVal):
         """Change the TAG's name. Coerced to a unicode."""
-        self._name = unicode(newVal)
+        self._name = str(newVal)
 
     @classmethod
     def load_from(cls, ctx):
@@ -132,7 +126,7 @@ class TAG_Long(TAG_Value):
     __slots__ = ('_name', '_value')
     tagID = TAG_LONG
     fmt = struct.Struct(">q")
-    data_type = long
+    data_type = int
 
 
 class TAG_Float(TAG_Value):
@@ -217,7 +211,7 @@ class TAG_String(TAG_Value):
     __slots__ = ('_name', '_value')
 
     def data_type(self, value):
-        if isinstance(value, unicode):
+        if isinstance(value, str):
             return value
         else:
             decoded = self._decodeCache.get(value)
@@ -271,7 +265,7 @@ class TAG_Compound(TAG_Value, collections.MutableMapping):
         self.name = name
 
     def __repr__(self):
-        return "<%s name='%s' keys=%r>" % (str(self.__class__.__name__), self.name, self.keys())
+        return "<%s name='%s' keys=%r>" % (str(self.__class__.__name__), self.name, list(self.keys()))
 
     def data_type(self, val):
         for i in val:
@@ -319,7 +313,7 @@ class TAG_Compound(TAG_Value, collections.MutableMapping):
         data = buf.getvalue()
 
         if compressed:
-            gzio = StringIO()
+            gzio = BytesIO()
             gz = gzip.GzipFile(fileobj=gzio, mode='wb')
             gz.write(data)
             gz.close()
@@ -328,8 +322,8 @@ class TAG_Compound(TAG_Value, collections.MutableMapping):
         if filename_or_buf is None:
             return data
 
-        if isinstance(filename_or_buf, basestring):
-            f = file(filename_or_buf, "wb")
+        if isinstance(filename_or_buf, str):
+            f = open(filename_or_buf, "wb")
             f.write(data)
         else:
             filename_or_buf.write(data)
@@ -353,10 +347,10 @@ class TAG_Compound(TAG_Value, collections.MutableMapping):
         raise KeyError("Key {0} not found".format(key))
 
     def __iter__(self):
-        return itertools.imap(lambda x: x.name, self.value)
+        return map(lambda x: x.name, self.value)
 
     def __contains__(self, key):
-        return key in map(lambda x: x.name, self.value)
+        return key in [x.name for x in self.value]
 
     def __len__(self):
         return self.value.__len__()
@@ -366,7 +360,7 @@ class TAG_Compound(TAG_Value, collections.MutableMapping):
         and unicodes in a TAG_String."""
         if isinstance(item, (list, tuple)):
             item = TAG_List(item)
-        elif isinstance(item, basestring):
+        elif isinstance(item, str):
             item = TAG_String(item)
 
         item.name = key
@@ -374,7 +368,7 @@ class TAG_Compound(TAG_Value, collections.MutableMapping):
 
         # remove any items already named "key".
         if not self.ALLOW_DUPLICATE_KEYS:
-            self._value = filter(lambda x: x.name != key, self._value)
+            self._value = [x for x in self._value if x.name != key]
 
         self._value.append(item)
 
@@ -493,13 +487,13 @@ tag_classes = { c.tagID: c for c in (TAG_Byte, TAG_Short, TAG_Int, TAG_Long, TAG
 
 
 def gunzip(data):
-    return gzip.GzipFile(fileobj=StringIO(data)).read()
+    return gzip.GzipFile(fileobj=BytesIO(data)).read()
 
 
 def try_gunzip(data):
     try:
         data = gunzip(data)
-    except IOError, zlib.error:
+    except (IOError, zlib.error):
         pass
     return data
 
@@ -511,7 +505,7 @@ def load(filename="", buf=None):
     containing NBT data.
     """
     if filename:
-        buf = file(filename, "rb")
+        buf = open(filename, "rb")
 
     if hasattr(buf, "read"):
         buf = buf.read()
@@ -546,7 +540,7 @@ def _load_buffer(buf):
     return tag
 
 
-__all__ = [a.__name__ for a in tag_classes.itervalues()] + ["load", "gunzip"]
+__all__ = [a.__name__ for a in tag_classes.values()] + ["load", "gunzip"]
 
 import nbt_util
 
