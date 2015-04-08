@@ -110,14 +110,14 @@ class MCIndevLevel(EntityLevel):
         self.LocalPlayer["Pos"] = nbt.TAG_List([nbt.TAG_Float(p) for p in pos])
 
     def getPlayerPosition(self, player="Ignored"):
-        return array(map(lambda x: x.value, self.LocalPlayer["Pos"]))
+        return array([x.value for x in self.LocalPlayer["Pos"]])
 
     def setPlayerOrientation(self, yp, player="Ignored"):
         self.LocalPlayer["Rotation"] = nbt.TAG_List([nbt.TAG_Float(p) for p in yp])
 
     def getPlayerOrientation(self, player="Ignored"):
         """ returns (yaw, pitch) """
-        return array(map(lambda x: x.value, self.LocalPlayer["Rotation"]))
+        return array([x.value for x in self.LocalPlayer["Rotation"]])
 
     def setBlockDataAt(self, x, y, z, newdata):
         if x < 0 or y < 0 or z < 0:
@@ -141,7 +141,7 @@ class MCIndevLevel(EntityLevel):
         return self.BlockLight[x, z, y]
 
     def __repr__(self):
-        return u"MCIndevLevel({0}): {1}W {2}L {3}H".format(self.filename, self.Width, self.Length, self.Height)
+        return "MCIndevLevel({0}): {1}W {2}L {3}H".format(self.filename, self.Width, self.Length, self.Height)
 
     @classmethod
     def _isTagLevel(cls, root_tag):
@@ -214,7 +214,7 @@ class MCIndevLevel(EntityLevel):
                 self.LocalPlayer = localPlayerList[0]
 
         else:
-            log.info(u"Creating new Indev levels is not yet implemented.!")
+            log.info("Creating new Indev levels is not yet implemented.!")
             raise ValueError("Can't do that yet")
 #            self.SurroundingGroundHeight = root_tag[Environment][SurroundingGroundHeight].value
 #            self.SurroundingGroundType = root_tag[Environment][SurroundingGroundType].value
@@ -243,7 +243,7 @@ class MCIndevLevel(EntityLevel):
                                8, 9, 10, 11, 12, 13, 14, 15])
 
         torchIndexes = (self.Blocks == self.materials.Torch.ID)
-        log.info(u"Rotating torches: {0}".format(len(torchIndexes.nonzero()[0])))
+        log.info("Rotating torches: {0}".format(len(torchIndexes.nonzero()[0])))
         self.Data[torchIndexes] = torchRotation[self.Data[torchIndexes]]
 
     def decodePos(self, v):
@@ -259,7 +259,7 @@ class MCIndevLevel(EntityLevel):
         if filename is None:
             filename = self.filename
         if filename is None:
-            log.warn(u"Attempted to save an unnamed file in place")
+            log.warn("Attempted to save an unnamed file in place")
             return  # you fool!
 
         self.Data <<= 4

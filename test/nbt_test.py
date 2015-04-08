@@ -1,11 +1,11 @@
-from cStringIO import StringIO
+from io import StringIO
 import os
 from os.path import join
 import time
 import unittest
 import numpy
 from pymclevel import nbt
-from templevel import TempLevel
+from .templevel import TempLevel
 
 __author__ = 'Rio'
 
@@ -16,13 +16,13 @@ class TestNBT():
         level = nbt.load("testfiles/hell.mclevel")
 
         # The root tag must have a name, and so must any tag within a TAG_Compound
-        print level.name
+        print(level.name)
 
         # Use the [] operator to look up subtags of a TAG_Compound.
-        print level["Environment"]["SurroundingGroundHeight"].value
+        print(level["Environment"]["SurroundingGroundHeight"].value)
 
         # Numeric, string, and bytearray types have a value that can be accessed and changed.
-        print level["Map"]["Blocks"].value
+        print(level["Map"]["Blocks"].value)
 
         return level
 
@@ -159,7 +159,7 @@ class TestNBT():
 
         n = newlevel["Map"]["Spawn"][0].name
         if n:
-            print "Named list element failed: %s" % n
+            print("Named list element failed: %s" % n)
 
         # attempt to delete non-existent TAG_Compound elements
         # this generates a KeyError like a python dict does.

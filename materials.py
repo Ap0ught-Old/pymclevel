@@ -126,7 +126,7 @@ class MCMaterials(object):
                 level.materials["Lapis Lazuli Block"]  # in Classic
 
            """
-        if isinstance(key, basestring):
+        if isinstance(key, str):
             for b in self.allBlocks:
                 if b.name == key:
                     return b
@@ -153,8 +153,8 @@ class MCMaterials(object):
             import pkg_resources
 
             f = pkg_resources.resource_stream(__name__, filename)
-        except (ImportError, IOError), e:
-            print "Cannot get resource_stream for ", filename, e
+        except (ImportError, IOError) as e:
+            print("Cannot get resource_stream for ", filename, e)
             root = os.environ.get("PYMCLEVEL_YAML_ROOT", "pymclevel")  # fall back to cwd as last resort
             path = join(root, filename)
 
@@ -162,12 +162,12 @@ class MCMaterials(object):
 
             f = file(path)
         try:
-            log.info(u"Loading block info from %s", f)
+            log.info("Loading block info from %s", f)
             blockyaml = yaml.load(f)
             self.addYamlBlocks(blockyaml)
 
-        except Exception, e:
-            log.error(u"Exception while loading block info from %s: %s", f, e)
+        except Exception as e:
+            log.error("Exception while loading block info from %s: %s", f, e)
             raise
 
     def addYamlBlocks(self, blockyaml):
@@ -175,9 +175,9 @@ class MCMaterials(object):
         for block in blockyaml['blocks']:
             try:
                 self.addYamlBlock(block)
-            except Exception, e:
-                log.error(u"Exception while parsing block: %s", e)
-                log.error(u"Block definition: \n%s", pformat(block))
+            except Exception as e:
+                log.error("Exception while parsing block: %s", e)
+                log.error("Block definition: \n%s", pformat(block))
                 raise
 
     def addYamlBlock(self, kw):
@@ -199,7 +199,7 @@ class MCMaterials(object):
         # # 'type'
         # ]
 
-        for val, data in kw.get('data', {0: {}}).items():
+        for val, data in list(kw.get('data', {0: {}}).items()):
             datakw = dict(kw)
             datakw.update(data)
             idStr = datakw.get('idStr', "")
@@ -213,7 +213,7 @@ class MCMaterials(object):
                 "TOP": 2,
                 "BOTTOM": 3,
             }
-            for dirname, dirtex in datakw.get('tex_direction', {}).items():
+            for dirname, dirtex in list(datakw.get('tex_direction', {}).items()):
                 if dirname == "SIDES":
                     for dirname in ("LEFT", "RIGHT"):
                         texture[texDirs[dirname]] = [t * 16 for t in dirtex]
@@ -240,7 +240,7 @@ class MCMaterials(object):
                 rot = (5, 0, 2, 3, 4, 1)
                 texture[:] = [texture[r] for r in rot]
 
-            for data, dir in tex_direction_data.items():
+            for data, dir in list(tex_direction_data.items()):
                 for _i in range(texDirMap.get(dir, 0)):
                     rot90cw()
                 self.blockTextures[blockID][data] = texture
@@ -308,7 +308,7 @@ Stem = (0xD0, 0x80)
 
 
 def defineShroomFaces(Shroom, id, name):
-    for way, data in sorted(HugeMushroomTypes.items(), key=lambda a: a[1]):
+    for way, data in sorted(list(HugeMushroomTypes.items()), key=lambda a: a[1]):
         loway = way.lower()
         if way is "Stem":
             tex = [Stem, Stem, Pore, Pore, Stem, Stem]
@@ -803,11 +803,11 @@ def printStaticDefs(name):
     # printStaticDefs('alphaMaterials')
     mats = eval(name)
     for b in sorted(mats.allBlocks):
-        print "{name}.{0} = {name}[{1},{2}]".format(
+        print("{name}.{0} = {name}[{1},{2}]".format(
             b.name.replace(" ", "").replace("(","").replace(")",""),
             b.ID, b.blockData,
             name=name,
-        )
+        ))
 
 _indices = rollaxis(indices((id_limit, 16)), 0, 3)
 

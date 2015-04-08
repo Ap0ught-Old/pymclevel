@@ -1,5 +1,5 @@
-import anvil_test
-from templevel import TempLevel
+from . import anvil_test
+from .templevel import TempLevel
 
 __author__ = 'Rio'
 

@@ -10,7 +10,7 @@ from pymclevel import nbt
 from pymclevel.schematic import MCSchematic
 from pymclevel.box import BoundingBox
 from pymclevel import block_copy
-from templevel import mktemp, TempLevel
+from .templevel import mktemp, TempLevel
 
 __author__ = 'Rio'
 
@@ -36,7 +36,7 @@ class TestAnvilLevel(unittest.TestCase):
 
     def testGetEntities(self):
         level = self.anvilLevel.level
-        print len(level.getEntitiesInBox(level.bounds))
+        print(len(level.getEntitiesInBox(level.bounds)))
 
     def testCreateChunks(self):
         level = self.anvilLevel.level
@@ -79,7 +79,7 @@ class TestAnvilLevel(unittest.TestCase):
 
     def testImportSchematic(self):
         level = self.anvilLevel.level
-        cx, cz = level.allChunks.next()
+        cx, cz = next(level.allChunks)
 
         schem = mclevel.fromFile("schematics/CreativeInABox.schematic")
         box = BoundingBox((cx * 16, 64, cz * 16), schem.bounds.size)
@@ -92,14 +92,14 @@ class TestAnvilLevel(unittest.TestCase):
     def testRecreateChunks(self):
         level = self.anvilLevel.level
 
-        for x, z in itertools.product(xrange(-1, 3), xrange(-1, 2)):
+        for x, z in itertools.product(range(-1, 3), range(-1, 2)):
             level.deleteChunk(x, z)
             assert not level.containsChunk(x, z)
             level.createChunk(x, z)
 
     def testFill(self):
         level = self.anvilLevel.level
-        cx, cz = level.allChunks.next()
+        cx, cz = next(level.allChunks)
         box = BoundingBox((cx * 16, 0, cz * 16), (32, level.Height, 32))
         level.fillBlocks(box, level.materials.WoodPlanks)
         level.fillBlocks(box, level.materials.WoodPlanks, [level.materials.Stone])
@@ -129,7 +129,7 @@ class TestAnvilLevel(unittest.TestCase):
 
     def testRecompress(self):
         level = self.anvilLevel.level
-        cx, cz = level.allChunks.next()
+        cx, cz = next(level.allChunks)
 
         ch = level.getChunk(cx, cz)
         ch.dirty = True

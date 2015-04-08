@@ -48,7 +48,7 @@ class TileEntity(object):
         ),
     }
 
-    knownIDs = baseStructures.keys()
+    knownIDs = list(baseStructures.keys())
     maxItems = {
         "Furnace": 3,
         "Chest": 27,
@@ -203,7 +203,7 @@ class Entity(object):
     def copyWithOffset(cls, entity, copyOffset):
         eTag = deepcopy(entity)
 
-        positionTags = map(lambda p, co: nbt.TAG_Double(p.value + co), eTag["Pos"], copyOffset)
+        positionTags = list(map(lambda p, co: nbt.TAG_Double(p.value + co), eTag["Pos"], copyOffset))
         eTag["Pos"] = nbt.TAG_List(positionTags)
 
         if eTag["id"].value in ("Painting", "ItemFrame"):

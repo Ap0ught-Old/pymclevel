@@ -1,4 +1,4 @@
-from StringIO import StringIO
+from io import StringIO
 
 __author__ = 'Rio'
 
@@ -20,10 +20,10 @@ def save_file():
     #resaved_test_file = test_file.save(buf=s)
     #resaved_test_file = s.getvalue()
 
-print "File: ", path
-print "Load: %0.1f ms" % (timeit(load_file, number=1)*1000)
-print "Save: %0.1f ms" % (timeit(save_file, number=1)*1000)
-print "Length: ", len(resaved_test_file)
+print("File: ", path)
+print("Load: %0.1f ms" % (timeit(load_file, number=1)*1000))
+print("Save: %0.1f ms" % (timeit(save_file, number=1)*1000))
+print("Length: ", len(resaved_test_file))
 
 assert test_data == resaved_test_file
 __author__ = 'Rio'

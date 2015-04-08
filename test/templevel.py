@@ -30,7 +30,7 @@ class TempLevel(object):
         elif createFunc:
             createFunc(tmpname)
         else:
-            raise IOError, "File %s not found." % filename
+            raise IOError("File %s not found." % filename)
 
         self.tmpname = tmpname
         self.level = mclevel.fromFile(tmpname)

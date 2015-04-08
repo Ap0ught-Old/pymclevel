@@ -218,7 +218,7 @@ class MCLevel(object):
     def allChunks(self):
         """Returns a synthetic list of chunk positions (xPos, zPos), to fake
         being a chunked level format."""
-        return itertools.product(xrange(0, self.Width + 15 >> 4), xrange(0, self.Length + 15 >> 4))
+        return itertools.product(range(0, self.Width + 15 >> 4), range(0, self.Length + 15 >> 4))
 
     def getChunks(self, chunks=None):
         """ pass a list of chunk coordinate tuples to get an iterator yielding
@@ -490,7 +490,7 @@ class EntityLevel(MCLevel):
 
             return not ((tileEntityTag is a) or TileEntity.pos(a) == TileEntity.pos(tileEntityTag))
 
-        self.TileEntities.value[:] = filter(differentPosition, self.TileEntities)
+        self.TileEntities.value[:] = list(filter(differentPosition, self.TileEntities))
 
         self.TileEntities.append(tileEntityTag)
         self._fakeEntities = None
@@ -505,7 +505,7 @@ class EntityLevel(MCLevel):
             for i, e in enumerate((self.Entities, self.TileEntities)):
                 for ent in e:
                     x, y, z = [Entity, TileEntity][i].pos(ent)
-                    ecx, ecz = map(lambda x: (int(floor(x)) >> 4), (x, z))
+                    ecx, ecz = [(int(floor(x)) >> 4) for x in (x, z)]
 
                     self._fakeEntities[ecx, ecz][i].append(ent)
 
@@ -592,11 +592,11 @@ class LightedChunk(ChunkBase):
         skylight = self.SkyLight
         heightmap = self.HeightMap
 
-        for x, z in itertools.product(xrange(16), xrange(16)):
+        for x, z in itertools.product(range(16), range(16)):
 
             skylight[x, z, heightmap[z, x]:] = 15
             lv = 15
-            for y in reversed(range(heightmap[z, x])):
+            for y in reversed(list(range(heightmap[z, x]))):
                 lv -= (la[blocks[x, z, y]] or 1)
 
                 if lv <= 0:

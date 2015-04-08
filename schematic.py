@@ -127,7 +127,7 @@ class MCSchematic (EntityLevel):
         if filename is None:
             filename = self.filename
         if filename is None:
-            raise IOError, u"Attempted to save an unnamed schematic in place"
+            raise IOError("Attempted to save an unnamed schematic in place")
 
         self.Materials = self.materials.name
 
@@ -160,7 +160,7 @@ class MCSchematic (EntityLevel):
 
 
     def __str__(self):
-        return u"MCSchematic(shape={0}, materials={2}, filename=\"{1}\")".format(self.size, self.filename or u"", self.Materials)
+        return "MCSchematic(shape={0}, materials={2}, filename=\"{1}\")".format(self.size, self.filename or "", self.Materials)
 
     # these refer to the blocks array instead of the file's height because rotation swaps the axes
     # this will have an impact later on when editing schematics instead of just importing/exporting
@@ -229,7 +229,7 @@ class MCSchematic (EntityLevel):
 
         blockrotation.RotateLeft(self.Blocks, self.Data)
 
-        log.info(u"Relocating entities...")
+        log.info("Relocating entities...")
         for entity in self.Entities:
             for p in "Pos", "Motion":
                 if p == "Pos":
@@ -289,7 +289,7 @@ class MCSchematic (EntityLevel):
 
         northSouthPaintingMap = [0, 3, 2, 1]
 
-        log.info(u"N/S Flip: Relocating entities...")
+        log.info("N/S Flip: Relocating entities...")
         for entity in self.Entities:
 
             entity["Pos"][0].value = self.Width - entity["Pos"][0].value
@@ -319,7 +319,7 @@ class MCSchematic (EntityLevel):
 
         eastWestPaintingMap = [2, 1, 0, 3]
 
-        log.info(u"E/W Flip: Relocating entities...")
+        log.info("E/W Flip: Relocating entities...")
         for entity in self.Entities:
 
             entity["Pos"][2].value = self.Length - entity["Pos"][2].value
@@ -399,8 +399,8 @@ class INVEditChest(MCSchematic):
             if None is root_tag:
                 try:
                     root_tag = nbt.load(filename)
-                except IOError, e:
-                    log.info(u"Failed to load file {0}".format(e))
+                except IOError as e:
+                    log.info("Failed to load file {0}".format(e))
                     raise
         else:
             assert root_tag, "Must have either root_tag or filename"
@@ -451,8 +451,8 @@ class ZipSchematic (infiniteworld.MCInfdevOldLevel):
             if "Materials" in schematicDat:
                 self.materials = namedMaterials[schematicDat["Materials"].value]
 
-        except Exception, e:
-            print "Exception reading schematic.dat, skipping: {0!r}".format(e)
+        except Exception as e:
+            print("Exception reading schematic.dat, skipping: {0!r}".format(e))
             self.Width = 0
             self.Length = 0
 

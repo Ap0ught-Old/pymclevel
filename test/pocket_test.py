@@ -1,6 +1,6 @@
 import unittest
 import numpy
-from templevel import TempLevel
+from .templevel import TempLevel
 
 __author__ = 'Rio'
 
@@ -13,7 +13,7 @@ class TestPocket(unittest.TestCase):
     def testPocket(self):
         level = self.level.level
 #        alphalevel = self.alphalevel.level
-        print "Chunk count", len(level.allChunks)
+        print("Chunk count", len(level.allChunks))
         chunk = level.getChunk(1, 5)
         a = numpy.array(chunk.SkyLight)
         chunk.dirty = True

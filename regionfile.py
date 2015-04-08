@@ -74,10 +74,10 @@ class MCRegionFile(object):
             sector = offset >> 8
             count = offset & 0xff
 
-            for i in xrange(sector, sector + count):
+            for i in range(sector, sector + count):
                 if i >= len(self.freeSectors):
                     # raise RegionMalformed("Region file offset table points to sector {0} (past the end of the file)".format(i))
-                    print  "Region file offset table points to sector {0} (past the end of the file)".format(i)
+                    print("Region file offset table points to sector {0} (past the end of the file)".format(i))
                     needsRepair = True
                     break
                 if self.freeSectors[i] is False:
@@ -136,7 +136,7 @@ class MCRegionFile(object):
                     zPos = lev["zPos"].value
                     overlaps = False
 
-                    for i in xrange(sectorStart, sectorStart + sectorCount):
+                    for i in range(sectorStart, sectorStart + sectorCount):
                         if _freeSectors[i] is False:
                             overlaps = True
                         _freeSectors[i] = False
@@ -149,12 +149,12 @@ class MCRegionFile(object):
                         else:
                             raise RegionMalformed("Chunk {found} (in slot {expected}) has overlapping sectors with another chunk!".format(found=(xPos, zPos), expected=(cx, cz)))
 
-                except Exception, e:
+                except Exception as e:
                     log.info("Unexpected chunk data at sector {sector} ({exc})".format(sector=sectorStart, exc=e))
                     self.setOffset(cx, cz, 0)
                     deleted += 1
 
-        for cPos, foundData in lostAndFound.iteritems():
+        for cPos, foundData in lostAndFound.items():
             cx, cz = cPos
             if self.getOffset(cx, cz) == 0:
                 log.info("Found chunk {found} and its slot is empty, recovering it".format(found=cPos))
@@ -183,7 +183,7 @@ class MCRegionFile(object):
             f.seek(sectorStart * self.SECTOR_BYTES)
             data = f.read(numSectors * self.SECTOR_BYTES)
         if len(data) < 5:
-            raise RegionMalformed, "Chunk data is only %d bytes long (expected 5)" % len(data)
+            raise RegionMalformed("Chunk data is only %d bytes long (expected 5)" % len(data))
 
         # log.debug("REGION LOAD {0},{1} sector {2}".format(cx, cz, sectorStart))
 
@@ -237,7 +237,7 @@ class MCRegionFile(object):
             # we need to allocate new sectors
 
             # mark the sectors previously used for this chunk as free
-            for i in xrange(sectorNumber, sectorNumber + sectorsAllocated):
+            for i in range(sectorNumber, sectorNumber + sectorsAllocated):
                 self.freeSectors[i] = True
 
             runLength = 0

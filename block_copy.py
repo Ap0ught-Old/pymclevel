@@ -30,9 +30,9 @@ def sourceMaskFunc(blocksToCopy):
 
 def adjustCopyParameters(destLevel, sourceLevel, sourceBox, destinationPoint):
     # if the destination box is outside the level, it and the source corners are moved inward to fit.
-    (dx, dy, dz) = map(int, destinationPoint)
+    (dx, dy, dz) = list(map(int, destinationPoint))
 
-    log.debug(u"Asked to copy {} blocks \n\tfrom {} in {}\n\tto {} in {}" .format(
+    log.debug("Asked to copy {} blocks \n\tfrom {} in {}\n\tto {} in {}" .format(
               sourceBox.volume, sourceBox, sourceLevel, destinationPoint, destLevel))
     if destLevel.Width == 0:
         return sourceBox, destinationPoint
@@ -56,7 +56,7 @@ def copyBlocksFromIter(destLevel, sourceLevel, sourceBox, destinationPoint, bloc
 
     sourceBox, destinationPoint = adjustCopyParameters(destLevel, sourceLevel, sourceBox, destinationPoint)
     # needs work xxx
-    log.info(u"Copying {0} blocks from {1} to {2}" .format(ly * lz * lx, sourceBox, destinationPoint))
+    log.info("Copying {0} blocks from {1} to {2}" .format(ly * lz * lx, sourceBox, destinationPoint))
     startTime = datetime.now()
 
     destBox = BoundingBox(destinationPoint, sourceBox.size)

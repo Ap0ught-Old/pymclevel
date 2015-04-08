@@ -79,5 +79,3 @@ else:
     appSupportDir = os.path.expanduser('~/.pymclevel')
 
 saveFileDir = os.path.join(minecraftDir, 'saves')
-
-

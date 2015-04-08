@@ -112,7 +112,7 @@ def do_test(test_data, result_check, arguments=()):
         checksum = calculate_result(directory).lower()
         if checksum != result_check.lower():
             raise RegressionError("Checksum mismatch: {0!r} != {1!r}".format(checksum, result_check))
-    print "[OK] (sha1sum of result is {0!r}, as expected)".format(result_check)
+    print("[OK] (sha1sum of result is {0!r}, as expected)".format(result_check))
 
 
 def do_test_match_output(test_data, result_check, arguments=()):
@@ -132,7 +132,7 @@ def do_test_match_output(test_data, result_check, arguments=()):
         if proc.returncode:
             raise RegressionError("Program execution failed!")
 
-        print "Output\n{0}".format(output)
+        print("Output\n{0}".format(output))
 
         checksum = hashlib.sha1()
         checksum.update(output)
@@ -141,7 +141,7 @@ def do_test_match_output(test_data, result_check, arguments=()):
         if checksum != result_check.lower():
             raise RegressionError("Checksum mismatch: {0!r} != {1!r}".format(checksum, result_check))
 
-    print "[OK] (sha1sum of result is {0!r}, as expected)".format(result_check)
+    print("[OK] (sha1sum of result is {0!r}, as expected)".format(result_check))
 
 
 alpha_tests = [
@@ -174,24 +174,24 @@ def main(argv):
         fails = []
 
         for func, name, sha, args in alpha_tests:
-            print "Starting regression {0} ({1})".format(name, args)
+            print("Starting regression {0} ({1})".format(name, args))
 
             if any(fnmatch.fnmatch(name, x) for x in do_these_regressions):
                 if options.profile:
-                    print >> sys.stderr, "Starting to profile to %s.profile" % name
+                    print("Starting to profile to %s.profile" % name, file=sys.stderr)
                     os.environ['MCE_PROFILE'] = '%s.profile' % name
                 try:
                     func(test_data, sha, args)
-                except RegressionError, e:
+                except RegressionError as e:
                     fails.append("Regression {0} failed: {1}".format(name, e))
-                    print fails[-1]
+                    print(fails[-1])
                 else:
                     passes.append("Regression {0!r} complete.".format(name))
-                    print passes[-1]
+                    print(passes[-1])
 
-        print "{0} tests passed.".format(len(passes))
+        print("{0} tests passed.".format(len(passes)))
         for line in fails:
-            print line
+            print(line)
 
 
 if __name__ == '__main__':

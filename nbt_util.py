@@ -6,7 +6,7 @@ def nested_string(tag, indent_string="  ", indent=0):
     if tag.tagID == nbt.TAG_COMPOUND:
         result += 'TAG_Compound({\n'
         indent += 1
-        for key, value in tag.iteritems():
+        for key, value in tag.items():
             result += indent_string * indent + '"%s": %s,\n' % (key, nested_string(value, indent_string, indent))
         indent -= 1
         result += indent_string * indent + '})'

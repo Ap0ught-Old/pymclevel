@@ -115,9 +115,9 @@ class BoundingBox (object):
     def positions(self):
         """iterate through all of the positions within this selection box"""
         return itertools.product(
-            xrange(self.minx, self.maxx),
-            xrange(self.miny, self.maxy),
-            xrange(self.minz, self.maxz)
+            range(self.minx, self.maxx),
+            range(self.miny, self.maxy),
+            range(self.minz, self.maxz)
         )
 
     def intersect(self, box):
@@ -222,7 +222,7 @@ class BoundingBox (object):
     @property
     def chunkPositions(self):
         #iterate through all of the chunk positions within this selection box
-        return itertools.product(xrange(self.mincx, self.maxcx), xrange(self.mincz, self.maxcz))
+        return itertools.product(range(self.mincx, self.maxcx), range(self.mincz, self.maxcz))
 
     @property
     def chunkCount(self):

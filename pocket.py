@@ -63,10 +63,10 @@ class PocketChunksFile(object):
             sector = offset >> 8
             count = offset & 0xff
 
-            for i in xrange(sector, sector + count):
+            for i in range(sector, sector + count):
                 if i >= len(self.freeSectors):
                     # raise RegionMalformed("Region file offset table points to sector {0} (past the end of the file)".format(i))
-                    print  "Region file offset table points to sector {0} (past the end of the file)".format(i)
+                    print("Region file offset table points to sector {0} (past the end of the file)".format(i))
                     needsRepair = True
                     break
                 if self.freeSectors[i] is False:
@@ -210,7 +210,7 @@ class PocketChunksFile(object):
             # we need to allocate new sectors
 
             # mark the sectors previously used for this chunk as free
-            for i in xrange(sectorNumber, sectorNumber + sectorsAllocated):
+            for i in range(sectorNumber, sectorNumber + sectorsAllocated):
                 self.freeSectors[i] = True
 
             runLength = 0
@@ -341,7 +341,7 @@ class PocketWorld(ChunkedLevelMixin, MCLevel):
         return all([os.path.exists(os.path.join(filename, f)) for f in clp])
 
     def saveInPlace(self):
-        for chunk in self._loadedChunks.itervalues():
+        for chunk in self._loadedChunks.values():
             if chunk.dirty:
                 self.chunkFile.saveChunk(chunk)
                 chunk.dirty = False
@@ -353,7 +353,7 @@ class PocketWorld(ChunkedLevelMixin, MCLevel):
 
     @property
     def chunksNeedingLighting(self):
-        for chunk in self._loadedChunks.itervalues():
+        for chunk in self._loadedChunks.values():
             if chunk.needsLighting:
                 yield chunk.chunkPosition
 

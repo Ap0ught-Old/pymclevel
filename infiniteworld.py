@@ -177,7 +177,7 @@ class AnvilChunkData(object):
     def savedTagData(self):
         """ does not recalculate any data or light """
 
-        log.debug(u"Saving chunk: {0}".format(self))
+        log.debug("Saving chunk: {0}".format(self))
         sanitizeBlocks(self)
 
         sections = nbt.TAG_List()
@@ -214,7 +214,7 @@ class AnvilChunkData(object):
         data = self.root_tag.save(compressed=False)
         del self.root_tag["Level"]["Sections"]
 
-        log.debug(u"Saved chunk {0}".format(self))
+        log.debug("Saved chunk {0}".format(self))
         return data
 
     @property
@@ -242,7 +242,7 @@ class AnvilChunk(LightedChunk):
 
 
     def __str__(self):
-        return u"AnvilChunk, coords:{0}, world: {1}, D:{2}, L:{3}".format(self.chunkPosition, self.world.displayName, self.dirty, self.needsLighting)
+        return "AnvilChunk, coords:{0}, world: {1}, D:{2}, L:{3}".format(self.chunkPosition, self.world.displayName, self.dirty, self.needsLighting)
 
     @property
     def needsLighting(self):
@@ -538,10 +538,11 @@ class ChunkedLevelMixin(MCLevel):
 
         maxLightingChunks = getattr(self, 'loadedChunkLimit', 400)
 
-        log.info(u"Asked to light {0} chunks".format(len(dirtyChunkPositions)))
+        log.info("Asked to light {0} chunks".format(len(dirtyChunkPositions)))
         chunkLists = [dirtyChunkPositions]
 
-        def reverseChunkPosition((cx, cz)):
+        def reverseChunkPosition(xxx_todo_changeme):
+            (cx, cz) = xxx_todo_changeme
             return cz, cx
 
         def splitChunkLists(chunkLists):
@@ -571,13 +572,13 @@ class ChunkedLevelMixin(MCLevel):
             chunkLists = splitChunkLists(chunkLists)
 
         if len(chunkLists) > 1:
-            log.info(u"Using {0} batches to conserve memory.".format(len(chunkLists)))
+            log.info("Using {0} batches to conserve memory.".format(len(chunkLists)))
         # batchSize = min(len(a) for a in chunkLists)
         estimatedTotals = [len(a) * 32 for a in chunkLists]
         workDone = 0
 
         for i, dc in enumerate(chunkLists):
-            log.info(u"Batch {0}/{1}".format(i, len(chunkLists)))
+            log.info("Batch {0}/{1}".format(i, len(chunkLists)))
 
             dc = sorted(dc)
             workTotal = sum(estimatedTotals)
@@ -592,7 +593,7 @@ class ChunkedLevelMixin(MCLevel):
         timeDelta = datetime.now() - startTime
 
         if len(dirtyChunkPositions):
-            log.info(u"Completed in {0}, {1} per chunk".format(timeDelta, dirtyChunkPositions and timeDelta / len(dirtyChunkPositions) or 0))
+            log.info("Completed in {0}, {1} per chunk".format(timeDelta, dirtyChunkPositions and timeDelta / len(dirtyChunkPositions) or 0))
 
         return
 
@@ -605,7 +606,7 @@ class ChunkedLevelMixin(MCLevel):
         workDone = 0
         workTotal = len(dirtyChunks) * 29
 
-        progressInfo = (u"Lighting {0} chunks".format(len(dirtyChunks)))
+        progressInfo = ("Lighting {0} chunks".format(len(dirtyChunks)))
         log.info(progressInfo)
 
         for i, chunk in enumerate(dirtyChunks):
@@ -648,7 +649,7 @@ class ChunkedLevelMixin(MCLevel):
             lights = ("BlockLight",)
         else:
             lights = ("BlockLight", "SkyLight")
-        log.info(u"Dispersing light...")
+        log.info("Dispersing light...")
 
         def clipLight(light):
             # light arrays are all uint8 by default, so when results go negative
@@ -667,7 +668,7 @@ class ChunkedLevelMixin(MCLevel):
                     workTotal -= len(startingDirtyChunks) * (14 - i)
                     break
 
-                progressInfo = u"{0} Pass {1}: {2} chunks".format(light, i, len(newDirtyChunks))
+                progressInfo = "{0} Pass {1}: {2} chunks".format(light, i, len(newDirtyChunks))
                 log.info(progressInfo)
 
 #                propagate light!
@@ -874,7 +875,7 @@ class AnvilWorldFolder(object):
             os.mkdir(filename)
 
         elif not os.path.isdir(filename):
-            raise IOError, "AnvilWorldFolder: Not a folder: %s" % filename
+            raise IOError("AnvilWorldFolder: Not a folder: %s" % filename)
 
         self.filename = filename
         self.regionFiles = {}
@@ -911,7 +912,7 @@ class AnvilWorldFolder(object):
         return self.getRegionFile(rx, rz)
 
     def closeRegions(self):
-        for rf in self.regionFiles.values():
+        for rf in list(self.regionFiles.values()):
             rf.close()
 
         self.regionFiles = {}
@@ -925,7 +926,7 @@ class AnvilWorldFolder(object):
             return None
 
         try:
-            rx, rz = map(int, bits[1:3])
+            rx, rz = list(map(int, bits[1:3]))
         except ValueError:
             return None
 
@@ -960,7 +961,7 @@ class AnvilWorldFolder(object):
 
                         chunks.add((cx, cz))
             else:
-                log.info(u"Removing empty region file {0}".format(filepath))
+                log.info("Removing empty region file {0}".format(filepath))
                 regionFile.close()
                 os.unlink(regionFile.path)
 
@@ -1082,15 +1083,15 @@ class MCInfdevOldLevel(ChunkedLevelMixin, EntityLevel):
         root_tag["Data"]["SpawnZ"] = nbt.TAG_Int(0)
 
         if last_played is None:
-            last_played = long(time.time() * 1000)
+            last_played = int(time.time() * 1000)
         if random_seed is None:
-            random_seed = long(random.random() * 0xffffffffffffffffL) - 0x8000000000000000L
+            random_seed = int(random.random() * 0xffffffffffffffff) - 0x8000000000000000
 
         self.root_tag = root_tag
         root_tag["Data"]['version'] = nbt.TAG_Int(self.VERSION_ANVIL)
 
-        self.LastPlayed = long(last_played)
-        self.RandomSeed = long(random_seed)
+        self.LastPlayed = int(last_played)
+        self.RandomSeed = int(random_seed)
         self.SizeOnDisk = 0
         self.Time = 1
         self.LevelName = os.path.basename(self.worldFolder.filename)
@@ -1102,14 +1103,14 @@ class MCInfdevOldLevel(ChunkedLevelMixin, EntityLevel):
     def acquireSessionLock(self):
         lockfile = self.worldFolder.getFilePath("session.lock")
         self.initTime = int(time.time() * 1000)
-        with file(lockfile, "wb") as f:
+        with open(lockfile, "wb") as f:
             f.write(struct.pack(">q", self.initTime))
             f.flush()
             os.fsync(f.fileno())
 
     def checkSessionLock(self):
         if self.readonly:
-            raise SessionLockLost, "World is opened read only."
+            raise SessionLockLost("World is opened read only.")
 
         lockfile = self.worldFolder.getFilePath("session.lock")
         try:
@@ -1117,7 +1118,7 @@ class MCInfdevOldLevel(ChunkedLevelMixin, EntityLevel):
         except struct.error:
             lock = -1
         if lock != self.initTime:
-            raise SessionLockLost, "Session lock lost. This world is being accessed from another location."
+            raise SessionLockLost("Session lock lost. This world is being accessed from another location.")
 
     def loadLevelDat(self, create=False, random_seed=None, last_played=None):
 
@@ -1127,30 +1128,30 @@ class MCInfdevOldLevel(ChunkedLevelMixin, EntityLevel):
         else:
             try:
                 self.root_tag = nbt.load(self.filename)
-            except Exception, e:
+            except Exception as e:
                 filename_old = self.worldFolder.getFilePath("level.dat_old")
                 log.info("Error loading level.dat, trying level.dat_old ({0})".format(e))
                 try:
                     self.root_tag = nbt.load(filename_old)
                     log.info("level.dat restored from backup.")
                     self.saveInPlace()
-                except Exception, e:
+                except Exception as e:
                     traceback.print_exc()
-                    print repr(e)
+                    print(repr(e))
                     log.info("Error loading level.dat_old. Initializing with defaults.")
                     self._create(self.filename, random_seed, last_played)
 
     def saveInPlace(self):
         if self.readonly:
-            raise IOError, "World is opened read only."
+            raise IOError("World is opened read only.")
 
         self.checkSessionLock()
 
-        for level in self.dimensions.itervalues():
+        for level in self.dimensions.values():
             level.saveInPlace(True)
 
         dirtyChunkCount = 0
-        for chunk in self._loadedChunkData.itervalues():
+        for chunk in self._loadedChunkData.values():
             cx, cz = chunk.chunkPosition
             if chunk.dirty:
                 data = chunk.savedTagData()
@@ -1170,13 +1171,13 @@ class MCInfdevOldLevel(ChunkedLevelMixin, EntityLevel):
         if not os.path.exists(self.unsavedWorkFolder.filename):
             os.mkdir(self.unsavedWorkFolder.filename)
 
-        for path, tag in self.playerTagCache.iteritems():
+        for path, tag in self.playerTagCache.items():
             tag.save(path)
 
         self.playerTagCache.clear()
 
         self.root_tag.save(self.filename)
-        log.info(u"Saved {0} chunks (dim {1})".format(dirtyChunkCount, self.dimNo))
+        log.info("Saved {0} chunks (dim {1})".format(dirtyChunkCount, self.dimNo))
 
     def unload(self):
         """
@@ -1227,7 +1228,7 @@ class MCInfdevOldLevel(ChunkedLevelMixin, EntityLevel):
     SizeOnDisk = TagProperty('SizeOnDisk', nbt.TAG_Long, 0)
     RandomSeed = TagProperty('RandomSeed', nbt.TAG_Long, 0)
     Time = TagProperty('Time', nbt.TAG_Long, 0)  # Age of the world in ticks. 20 ticks per second; 24000 ticks per day.
-    LastPlayed = TagProperty('LastPlayed', nbt.TAG_Long, lambda self: long(time.time() * 1000))
+    LastPlayed = TagProperty('LastPlayed', nbt.TAG_Long, lambda self: int(time.time() * 1000))
 
     LevelName = TagProperty('LevelName', nbt.TAG_String, lambda self: self.displayName)
 
@@ -1307,8 +1308,8 @@ class MCInfdevOldLevel(ChunkedLevelMixin, EntityLevel):
                     log.info("Found dimension {0}".format(dirname))
                     dim = MCAlphaDimension(self, dimNo)
                     self.dimensions[dimNo] = dim
-                except Exception, e:
-                    log.error(u"Error loading dimension {0}: {1}".format(dirname, e))
+                except Exception as e:
+                    log.error("Error loading dimension {0}: {1}".format(dirname, e))
 
     def getDimension(self, dimNo):
         if self.dimNo != 0:
@@ -1323,11 +1324,11 @@ class MCInfdevOldLevel(ChunkedLevelMixin, EntityLevel):
     # --- Region I/O ---
 
     def preloadChunkPositions(self):
-        log.info(u"Scanning for regions...")
+        log.info("Scanning for regions...")
         self._allChunks = self.worldFolder.listChunks()
         if not self.readonly:
             self._allChunks.update(self.unsavedWorkFolder.listChunks())
-        self._allChunks.update(self._loadedChunkData.iterkeys())
+        self._allChunks.update(iter(self._loadedChunkData.keys()))
 
     def getRegionForChunk(self, cx, cz):
         return self.worldFolder.getRegionFile(cx, cz)
@@ -1337,18 +1338,19 @@ class MCInfdevOldLevel(ChunkedLevelMixin, EntityLevel):
     def dirhash(self, n):
         return self.dirhashes[n % 64]
 
-    def _dirhash(self):
-        n = self
-        n = n % 64
-        s = u""
-        if n >= 36:
-            s += u"1"
-            n -= 36
-        s += u"0123456789abcdefghijklmnopqrstuvwxyz"[n]
-
-        return s
-
-    dirhashes = [_dirhash(n) for n in range(64)]
+    # def _dirhash(self):
+    #     n = self
+    #     n = n % 64
+    #     s = ""
+    #     if n >= 36:
+    #         s += "1"
+    #         n -= 36
+    #     s += "0123456789abcdefghijklmnopqrstuvwxyz"[n]
+    #
+    #     return s
+    #
+    # dirhashes = [_dirhash(n) for n in range(64)]
+    dirhashes = [x for x in "0123456789abcdefghijklmnopqrstuvwxyz"] + ["1"+x for x in "0123456789abcdefghijklmnopqr"]
 
     def _oldChunkFilename(self, cx, cz):
         return self.worldFolder.getFilePath("%s/%s/c.%s.%s.dat" % (self.dirhash(cx), self.dirhash(cz), base36(cx), base36(cz)))
@@ -1391,7 +1393,7 @@ class MCInfdevOldLevel(ChunkedLevelMixin, EntityLevel):
         """
         assert isinstance(world, MCInfdevOldLevel)
         if self.readonly:
-            raise IOError, "World is opened read only."
+            raise IOError("World is opened read only.")
         self.checkSessionLock()
 
         destChunk = self._loadedChunks.get((cx, cz))
@@ -1449,8 +1451,8 @@ class MCInfdevOldLevel(ChunkedLevelMixin, EntityLevel):
             chunkData = AnvilChunkData(self, (cx, cz), root_tag)
         except (MemoryError, ChunkNotPresent):
             raise
-        except Exception, e:
-            raise ChunkMalformed, "Chunk {0} had an error: {1!r}".format((cx, cz), e), sys.exc_info()[2]
+        except Exception as e:
+            raise ChunkMalformed("Chunk {0} had an error: {1!r}".format((cx, cz), e)).with_traceback(sys.exc_info()[2])
 
         if not self.readonly and self.unsavedWorkFolder.containsChunk(cx, cz):
             chunkData.dirty = True
@@ -1465,7 +1467,7 @@ class MCInfdevOldLevel(ChunkedLevelMixin, EntityLevel):
             # are in use by another object. If the chunk is dirty, save it to the temporary folder.
             if not self.readonly:
                 self.checkSessionLock()
-            for (ocx, ocz), oldChunkData in self._loadedChunkData.items():
+            for (ocx, ocz), oldChunkData in list(self._loadedChunkData.items()):
                 if (ocx, ocz) not in self._loadedChunks:
                     if oldChunkData.dirty and not self.readonly:
                         data = oldChunkData.savedTagData()
@@ -1497,7 +1499,7 @@ class MCInfdevOldLevel(ChunkedLevelMixin, EntityLevel):
             self.markDirtyChunk(cx, cz)
 
     def listDirtyChunks(self):
-        for cPos, chunkData in self._loadedChunkData.iteritems():
+        for cPos, chunkData in self._loadedChunkData.items():
             if chunkData.dirty:
                 yield cPos
 
@@ -1519,7 +1521,7 @@ class MCInfdevOldLevel(ChunkedLevelMixin, EntityLevel):
 
     def addEntity(self, entityTag):
         assert isinstance(entityTag, nbt.TAG_Compound)
-        x, y, z = map(lambda x: int(floor(x)), Entity.pos(entityTag))
+        x, y, z = [int(floor(x)) for x in Entity.pos(entityTag)]
 
         try:
             chunk = self.getChunk(x >> 4, z >> 4)
@@ -1605,14 +1607,14 @@ class MCInfdevOldLevel(ChunkedLevelMixin, EntityLevel):
                 self.createChunk(cx, cz)
             assert self.containsChunk(cx, cz), "Just created {0} but it didn't take".format((cx, cz))
             if i % 100 == 0:
-                log.info(u"Chunk {0}...".format(i))
+                log.info("Chunk {0}...".format(i))
 
         log.info("Created {0} chunks.".format(len(ret)))
 
         return ret
 
     def createChunksInBox(self, box):
-        log.info(u"Creating {0} chunks in {1}".format((box.maxcx - box.mincx) * (box.maxcz - box.mincz), ((box.mincx, box.mincz), (box.maxcx, box.maxcz))))
+        log.info("Creating {0} chunks in {1}".format((box.maxcx - box.mincx) * (box.maxcz - box.mincz), ((box.mincx, box.mincz), (box.maxcx, box.maxcz))))
         return self.createChunks(box.chunkPositions)
 
     def deleteChunk(self, cx, cz):
@@ -1624,10 +1626,10 @@ class MCInfdevOldLevel(ChunkedLevelMixin, EntityLevel):
 
 
     def deleteChunksInBox(self, box):
-        log.info(u"Deleting {0} chunks in {1}".format((box.maxcx - box.mincx) * (box.maxcz - box.mincz), ((box.mincx, box.mincz), (box.maxcx, box.maxcz))))
+        log.info("Deleting {0} chunks in {1}".format((box.maxcx - box.mincx) * (box.maxcz - box.mincz), ((box.mincx, box.mincz), (box.maxcx, box.maxcz))))
         i = 0
         ret = []
-        for cx, cz in itertools.product(xrange(box.mincx, box.maxcx), xrange(box.mincz, box.maxcz)):
+        for cx, cz in itertools.product(range(box.mincx, box.maxcx), range(box.mincz, box.maxcz)):
             i += 1
             if self.containsChunk(cx, cz):
                 self.deleteChunk(cx, cz)
@@ -1636,7 +1638,7 @@ class MCInfdevOldLevel(ChunkedLevelMixin, EntityLevel):
             assert not self.containsChunk(cx, cz), "Just deleted {0} but it didn't take".format((cx, cz))
 
             if i % 100 == 0:
-                log.info(u"Chunk {0}...".format(i))
+                log.info("Chunk {0}...".format(i))
 
         return ret
 
@@ -1698,7 +1700,8 @@ class MCInfdevOldLevel(ChunkedLevelMixin, EntityLevel):
             playerTag["Dimension"] = nbt.TAG_Int(0)
         playerTag["Dimension"].value = d
 
-    def setPlayerPosition(self, (x, y, z), player="Player"):
+    def setPlayerPosition(self, xxx_todo_changeme1, player="Player"):
+        (x, y, z) = xxx_todo_changeme1
         posList = nbt.TAG_List([nbt.TAG_Double(p) for p in (x, y-1.8, z)])
         playerTag = self.getPlayerTag(player)
 
@@ -1708,7 +1711,7 @@ class MCInfdevOldLevel(ChunkedLevelMixin, EntityLevel):
         playerTag = self.getPlayerTag(player)
         posList = playerTag["Pos"]
 
-        x, y, z = map(lambda x: x.value, posList)
+        x, y, z = [x.value for x in posList]
         return x, y + 1.8, z
 
     def setPlayerOrientation(self, yp, player="Player"):
@@ -1716,7 +1719,7 @@ class MCInfdevOldLevel(ChunkedLevelMixin, EntityLevel):
 
     def getPlayerOrientation(self, player="Player"):
         """ returns (yaw, pitch) """
-        yp = map(lambda x: x.value, self.getPlayerTag(player)["Rotation"])
+        yp = [x.value for x in self.getPlayerTag(player)["Rotation"]]
         y, p = yp
         if p == 0:
             p = 0.000000001
@@ -1787,7 +1790,7 @@ class MCInfdevOldLevel(ChunkedLevelMixin, EntityLevel):
 
         if playerName != "Player":
             if self.readonly:
-                raise IOError, "World is opened read only."
+                raise IOError("World is opened read only.")
             self.checkSessionLock()
             playerTag.save(self.getPlayerPath(playerName))
 
@@ -1809,7 +1812,7 @@ class MCAlphaDimension (MCInfdevOldLevel):
         return self.parentWorld.root_tag
 
     def __str__(self):
-        return u"MCAlphaDimension({0}, {1})".format(self.parentWorld, self.dimNo)
+        return "MCAlphaDimension({0}, {1})".format(self.parentWorld, self.dimNo)
 
     def loadLevelDat(self, create=False, random_seed=None, last_played=None):
         pass
@@ -1830,7 +1833,7 @@ class MCAlphaDimension (MCInfdevOldLevel):
 
     @property
     def displayName(self):
-        return u"{0} ({1})".format(self.parentWorld.displayName,
+        return "{0} ({1})".format(self.parentWorld.displayName,
                                    self.dimensionNames.get(self.dimNo, "Dimension %d" % self.dimNo))
 
     def saveInPlace(self, saveSelf=False):

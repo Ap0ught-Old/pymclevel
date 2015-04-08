@@ -1,5 +1,5 @@
 import unittest
-from templevel import TempLevel
+from .templevel import TempLevel
 
 from pymclevel.box import BoundingBox
 from pymclevel.entity import Entity, TileEntity

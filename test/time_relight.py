@@ -2,7 +2,7 @@ from pymclevel.infiniteworld import MCInfdevOldLevel
 from pymclevel import mclevel
 from timeit import timeit
 
-import templevel
+from . import templevel
 
 #import logging
 #logging.basicConfig(level=logging.INFO)
@@ -10,7 +10,7 @@ import templevel
 def natural_relight():
     world = mclevel.fromFile("testfiles/AnvilWorld")
     t = timeit(lambda: world.generateLights(world.allChunks), number=1)
-    print "Relight natural terrain: %d chunks in %.02f seconds (%.02fms per chunk)" % (world.chunkCount, t, t / world.chunkCount * 1000)
+    print("Relight natural terrain: %d chunks in %.02f seconds (%.02fms per chunk)" % (world.chunkCount, t, t / world.chunkCount * 1000))
 
 
 def manmade_relight():
@@ -26,7 +26,7 @@ def manmade_relight():
             world.copyBlocksFrom(station, station.bounds, (x * station.Width, 63, z * station.Length), create=True)
 
     t = timeit(lambda: world.generateLights(world.allChunks), number=1)
-    print "Relight manmade building: %d chunks in %.02f seconds (%.02fms per chunk)" % (world.chunkCount, t, t / world.chunkCount * 1000)
+    print("Relight manmade building: %d chunks in %.02f seconds (%.02fms per chunk)" % (world.chunkCount, t, t / world.chunkCount * 1000))
 
 if __name__ == '__main__':
     natural_relight()

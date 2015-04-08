@@ -623,7 +623,7 @@ class Items (object):
             try:
                 with file(filename) as f:
                     items_txt = f.read()
-            except Exception, e:
+            except Exception as e:
                 logger.info("Error reading '%s': %s", filename, e)
                 logger.info("Using internal data.")
                 items_txt = self.items_txt
@@ -670,12 +670,12 @@ class Items (object):
                     imagecoords = imagecoords.split(",")
 
                     self.itemtypes[(id, damagevalue)] = ItemType(id, name, imagefile, imagecoords, maxdamage, damagevalue, stacksize)
-            except Exception, e:
-                print "Error reading line:", e
-                print "Line: ", line
-                print
+            except Exception as e:
+                print("Error reading line:", e)
+                print("Line: ", line)
+                print()
 
-        self.names = dict((item.name, item.id) for item in self.itemtypes.itervalues())
+        self.names = dict((item.name, item.id) for item in self.itemtypes.values())
 
     def findItem(self, id=0, damage=None):
         item = self.itemtypes.get((id, damage))

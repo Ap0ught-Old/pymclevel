@@ -1,4 +1,4 @@
-"""
+'''
 Named Binary Tag library. Serializes and deserializes TAG_* objects
 to and from binary data. Load a Minecraft level by calling nbt.load().
 Create your own TAG_* objects and set their values.
@@ -14,7 +14,7 @@ http://www.minecraft.net/docs/NBT.txt
 
 
 Copyright 2010 David Rio Vierra
-"""
+'''
 import collections
 import gzip
 import itertools
@@ -49,15 +49,15 @@ TAG_SHORT_ARRAY = 12
 
 
 class TAG_Value(object):
-    """Simple values. Subclasses override fmt to change the type and size.
-    Subclasses may set data_type instead of overriding setValue for automatic data type coercion"""
+    '''Simple values. Subclasses override fmt to change the type and size.
+    Subclasses may set data_type instead of overriding setValue for automatic data type coercion'''
     __slots__ = ('_name', '_value')
 
-    def __init__(self, value=0, name=""):
+    def __init__(self, value=0, name=''):
         self.value = value
         self.name = name
 
-    fmt = struct.Struct("b")
+    fmt = struct.Struct('b')
     tagID = NotImplemented
     data_type = NotImplemented
 
@@ -67,7 +67,7 @@ class TAG_Value(object):
 
     @value.setter
     def value(self, newVal):
-        """Change the TAG's value. Data types are checked and coerced if needed."""
+        '''Change the TAG's value. Data types are checked and coerced if needed.'''
         self._value = self.data_type(newVal)
 
     @property
@@ -76,7 +76,7 @@ class TAG_Value(object):
 
     @name.setter
     def name(self, newVal):
-        """Change the TAG's name. Coerced to a unicode."""
+        '''Change the TAG's name. Coerced to a unicode.'''
         self._name = str(newVal)
 
     @classmethod
@@ -88,7 +88,7 @@ class TAG_Value(object):
         return self
 
     def __repr__(self):
-        return "<%s name=\"%s\" value=%r>" % (str(self.__class__.__name__), self.name, self.value)
+        return '<%s name="%s" value=%r>' % (str(self.__class__.__name__), self.name, self.value)
 
     def write_tag(self, buf):
         buf.write(chr(self.tagID))
@@ -102,63 +102,62 @@ class TAG_Value(object):
 
 
 class TAG_Byte(TAG_Value):
-    __slots__ = ('_name', '_value')
+    __slots__ = ()
     tagID = TAG_BYTE
-    fmt = struct.Struct(">b")
+    fmt = struct.Struct('>b')
     data_type = int
 
 
 class TAG_Short(TAG_Value):
-    __slots__ = ('_name', '_value')
+    __slots__ = ()
     tagID = TAG_SHORT
-    fmt = struct.Struct(">h")
+    fmt = struct.Struct('>h')
     data_type = int
 
 
 class TAG_Int(TAG_Value):
-    __slots__ = ('_name', '_value')
+    __slots__ = ()
     tagID = TAG_INT
-    fmt = struct.Struct(">i")
+    fmt = struct.Struct('>i')
     data_type = int
 
 
 class TAG_Long(TAG_Value):
-    __slots__ = ('_name', '_value')
+    __slots__ = ()
     tagID = TAG_LONG
-    fmt = struct.Struct(">q")
+    fmt = struct.Struct('>q')
     data_type = int
 
 
 class TAG_Float(TAG_Value):
-    __slots__ = ('_name', '_value')
+    __slots__ = ()
     tagID = TAG_FLOAT
-    fmt = struct.Struct(">f")
+    fmt = struct.Struct('>f')
     data_type = float
 
 
 class TAG_Double(TAG_Value):
-    __slots__ = ('_name', '_value')
+    __slots__ = ()
     tagID = TAG_DOUBLE
-    fmt = struct.Struct(">d")
+    fmt = struct.Struct('>d')
     data_type = float
 
 
 class TAG_Byte_Array(TAG_Value):
-    """Like a string, but for binary data. Four length bytes instead of
-    two. Value is a numpy array, and you can change its elements"""
+    '''Like a string, but for binary data. Four length bytes instead of
+    two. Value is a numpy array, and you can change its elements'''
+    __slots__ = ()
 
     tagID = TAG_BYTE_ARRAY
 
-    def __init__(self, value=None, name=""):
+    def __init__(self, value=None, name=''):
         if value is None:
             value = zeros(0, self.dtype)
         self.name = name
         self.value = value
 
     def __repr__(self):
-        return "<%s name=%s length=%d>" % (self.__class__, self.name, len(self.value))
-
-    __slots__ = ('_name', '_value')
+        return '<%s name="%s" length=%d>' % (self.__class__, self.name, len(self.value))
 
     def data_type(self, value):
         return array(value, self.dtype)
@@ -176,39 +175,38 @@ class TAG_Byte_Array(TAG_Value):
 
     def write_value(self, buf):
         value_str = self.value.tostring()
-        buf.write(struct.pack(">I%ds" % (len(value_str),), self.value.size, value_str))
+        buf.write(struct.pack('>I%ds' % (len(value_str),), self.value.size, value_str))
 
 
 class TAG_Int_Array(TAG_Byte_Array):
-    """An array of big-endian 32-bit integers"""
+    '''An array of big-endian 32-bit integers'''
+    __slots__ = ()
     tagID = TAG_INT_ARRAY
-    __slots__ = ('_name', '_value')
     dtype = numpy.dtype('>u4')
 
 
 
 class TAG_Short_Array(TAG_Int_Array):
-    """An array of big-endian 16-bit integers. Not official, but used by some mods."""
+    '''An array of big-endian 16-bit integers. Not official, but used by some mods.'''
+    __slots__ = ()
     tagID = TAG_SHORT_ARRAY
-    __slots__ = ('_name', '_value')
     dtype = numpy.dtype('>u2')
 
 
 class TAG_String(TAG_Value):
-    """String in UTF-8
+    '''String in UTF-8
     The value parameter must be a 'unicode' or a UTF-8 encoded 'str'
-    """
+    '''
+    __slots__ = ()
 
     tagID = TAG_STRING
 
-    def __init__(self, value="", name=""):
+    def __init__(self, value='', name=''):
         if name:
             self.name = name
         self.value = value
 
     _decodeCache = {}
-
-    __slots__ = ('_name', '_value')
 
     def data_type(self, value):
         if isinstance(value, str):
@@ -230,7 +228,7 @@ class TAG_String(TAG_Value):
     def write_value(self, buf):
         write_string(self._value, buf)
 
-string_len_fmt = struct.Struct(">H")
+string_len_fmt = struct.Struct('>H')
 
 
 def load_string(ctx):
@@ -244,28 +242,27 @@ def load_string(ctx):
 
 def write_string(string, buf):
     encoded = string.encode('utf-8')
-    buf.write(struct.pack(">h%ds" % (len(encoded),), len(encoded), encoded))
+    buf.write(struct.pack('>h%ds' % (len(encoded),), len(encoded), encoded))
 
 #noinspection PyMissingConstructor
 
 
 class TAG_Compound(TAG_Value, collections.MutableMapping):
-    """A heterogenous list of named tags. Names must be unique within
+    '''A heterogenous list of named tags. Names must be unique within
     the TAG_Compound. Add tags to the compound using the subscript
-    operator [].    This will automatically name the tags."""
+    operator [].    This will automatically name the tags.'''
+    __slots__ = ()
 
     tagID = TAG_COMPOUND
 
     ALLOW_DUPLICATE_KEYS = False
 
-    __slots__ = ('_name', '_value')
-
-    def __init__(self, value=None, name=""):
+    def __init__(self, value=None, name=''):
         self.value = value or []
         self.name = name
 
     def __repr__(self):
-        return "<%s name='%s' keys=%r>" % (str(self.__class__.__name__), self.name, list(self.keys()))
+        return '<%s name="%s" keys=%r>' % (str(self.__class__.__name__), self.name, list(self.keys()))
 
     def data_type(self, val):
         for i in val:
@@ -274,9 +271,9 @@ class TAG_Compound(TAG_Value, collections.MutableMapping):
 
     def check_value(self, val):
         if not isinstance(val, TAG_Value):
-            raise TypeError("Invalid type for TAG_Compound element: %s" % val.__class__.__name__)
+            raise TypeError('Invalid type for TAG_Compound element: %s' % val.__class__.__name__)
         if not val.name:
-            raise ValueError("Tag needs a name to be inserted into TAG_Compound: %s" % val)
+            raise ValueError('Tag needs a name to be inserted into TAG_Compound: %s' % val)
 
     @classmethod
     def load_from(cls, ctx):
@@ -297,14 +294,14 @@ class TAG_Compound(TAG_Value, collections.MutableMapping):
         return self
 
     def save(self, filename_or_buf=None, compressed=True):
-        """
+        '''
         Save the TAG_Compound element to a file. Since this element is the root tag, it can be named.
 
         Pass a filename to save the data to a file. Pass a file-like object (with a read() method)
         to write the data to that object. Pass nothing to return the data as a string.
-        """
+        '''
         if self.name is None:
-            self.name = ""
+            self.name = ''
 
         buf = StringIO()
         self.write_tag(buf)
@@ -323,7 +320,7 @@ class TAG_Compound(TAG_Value, collections.MutableMapping):
             return data
 
         if isinstance(filename_or_buf, str):
-            f = open(filename_or_buf, "wb")
+            f = open(filename_or_buf, 'wb')
             f.write(data)
         else:
             filename_or_buf.write(data)
@@ -334,7 +331,7 @@ class TAG_Compound(TAG_Value, collections.MutableMapping):
             tag.write_name(buf)
             tag.write_value(buf)
 
-        buf.write("\x00")
+        buf.write('\x00')
 
     # --- collection functions ---
 
@@ -344,7 +341,7 @@ class TAG_Compound(TAG_Value, collections.MutableMapping):
         for tag in self.value:
             if tag.name == key:
                 return tag
-        raise KeyError("Key {0} not found".format(key))
+        raise KeyError('Key {0} not found'.format(key))
 
     def __iter__(self):
         return map(lambda x: x.name, self.value)
@@ -356,8 +353,8 @@ class TAG_Compound(TAG_Value, collections.MutableMapping):
         return self.value.__len__()
 
     def __setitem__(self, key, item):
-        """Automatically wraps lists and tuples in a TAG_List, and wraps strings
-        and unicodes in a TAG_String."""
+        '''Automatically wraps lists and tuples in a TAG_List, and wraps strings
+        and unicodes in a TAG_String.'''
         if isinstance(item, (list, tuple)):
             item = TAG_List(item)
         elif isinstance(item, str):
@@ -366,7 +363,7 @@ class TAG_Compound(TAG_Value, collections.MutableMapping):
         item.name = key
         self.check_value(item)
 
-        # remove any items already named "key".
+        # remove any items already named 'key'.
         if not self.ALLOW_DUPLICATE_KEYS:
             self._value = [x for x in self._value if x.name != key]
 
@@ -377,7 +374,7 @@ class TAG_Compound(TAG_Value, collections.MutableMapping):
 
     def add(self, value):
         if value.name is None:
-            raise ValueError("Tag %r must have a name." % value)
+            raise ValueError('Tag %r must have a name.' % value)
 
         self[value.name] = value
 
@@ -385,16 +382,17 @@ class TAG_Compound(TAG_Value, collections.MutableMapping):
         return [v for v in self._value if v.name == key]
 
 class TAG_List(TAG_Value, collections.MutableSequence):
-    """A homogenous list of unnamed data of a single TAG_* type.
+    '''A homogenous list of unnamed data of a single TAG_* type.
     Once created, the type can only be changed by emptying the list
     and adding an element of the new type. If created with no arguments,
     returns a list of TAG_Compound
 
-    Empty lists in the wild have been seen with type TAG_Byte"""
+    Empty lists in the wild have been seen with type TAG_Byte'''
+    __slots__ = ('list_type')
 
     tagID = 9
 
-    def __init__(self, value=None, name="", list_type=TAG_BYTE):
+    def __init__(self, value=None, name='', list_type=TAG_BYTE):
         # can be created from a list of tags in value, with an optional
         # name, or created from raw tag data, or created with list_type
         # taken from a TAG class or instance
@@ -403,11 +401,8 @@ class TAG_List(TAG_Value, collections.MutableSequence):
         self.list_type = list_type
         self.value = value or []
 
-    __slots__ = ('_name', '_value')
-
-
     def __repr__(self):
-        return "<%s name='%s' list_type=%r length=%d>" % (self.__class__.__name__, self.name,
+        return '<%s name="%s" list_type=%r length=%d>' % (self.__class__.__name__, self.name,
                                                           tag_classes[self.list_type],
                                                           len(self))
 
@@ -443,7 +438,7 @@ class TAG_List(TAG_Value, collections.MutableSequence):
 
     def check_tag(self, value):
         if value.tagID != self.list_type:
-            raise TypeError("Invalid type %s for TAG_List(%s)" % (value.__class__, tag_classes[self.list_type]))
+            raise TypeError('Invalid type %s for TAG_List(%s)' % (value.__class__, tag_classes[self.list_type]))
 
     # --- collection methods ---
 
@@ -477,7 +472,7 @@ class TAG_List(TAG_Value, collections.MutableSequence):
         else:
             self.check_tag(value)
 
-        value.name = ""
+        value.name = ''
         self.value.insert(index, value)
 
 
@@ -498,16 +493,16 @@ def try_gunzip(data):
     return data
 
 
-def load(filename="", buf=None):
-    """
+def load(filename='', buf=None):
+    '''
     Unserialize data from an NBT file and return the root TAG_Compound object. If filename is passed,
     reads from the file, otherwise uses data from buf. Buf can be a buffer object with a read() method or a string
     containing NBT data.
-    """
+    '''
     if filename:
-        buf = open(filename, "rb")
+        buf = open(filename, 'rb')
 
-    if hasattr(buf, "read"):
+    if hasattr(buf, 'read'):
         buf = buf.read()
 
     return _load_buffer(try_gunzip(buf))
@@ -521,7 +516,7 @@ def _load_buffer(buf):
     data = buf
 
     if not len(data):
-        raise NBTFormatError("Asked to load root tag of zero length")
+        raise NBTFormatError('Asked to load root tag of zero length')
 
     tag_type = data[0]
     if tag_type != 10:
@@ -540,7 +535,7 @@ def _load_buffer(buf):
     return tag
 
 
-__all__ = [a.__name__ for a in tag_classes.values()] + ["load", "gunzip"]
+__all__ = [a.__name__ for a in tag_classes.values()] + ['load', 'gunzip']
 
 import nbt_util
 
@@ -552,4 +547,3 @@ try:
     TAG_Byte_Array, TAG_List, TAG_Compound, TAG_Int_Array, TAG_Short_Array, NBTFormatError)
 except ImportError:
     pass
-
