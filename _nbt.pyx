@@ -38,19 +38,14 @@ import collections
 import gzip
 import zlib
 
-from cStringIO import StringIO
+from io import BytesIO
 from cpython cimport PyTypeObject, PyObject_TypeCheck, PyUnicode_DecodeUTF8, PyList_Append
 import numpy
 
-cdef extern from "cStringIO.h":
-    struct PycStringIO_CAPI:
-        int cwrite(object o, char * buf, Py_ssize_t len)
-        PyTypeObject * OutputType
-cdef extern from "cobject.h":
-    void * PyCObject_Import(char * module_name, char * cobject_name)
+cdef extern:
+    struct bytesio
+    Py_ssize_t write_bytes(bytesio *self, const char *bytes, Py_ssize_t len)
 
-cdef PycStringIO_CAPI *PycStringIO = <PycStringIO_CAPI *> PyCObject_Import("cStringIO", "cStringIO_CAPI")
-cdef PyTypeObject * StringO = PycStringIO.OutputType
 
 from numpy import array, zeros, uint8, fromstring, ndarray, frombuffer
 
@@ -388,13 +383,13 @@ cdef class _TAG_Compound(TAG_Value):
         Pass a filename to save the data to a file. Pass a file-like object (with a read() method)
         to write the data to that object. Pass nothing to return the data as a string.
         """
-        io = StringIO()
+        io = BytesIO()
         save_tag_id(self.tagID, io)
         save_tag_name(self, io)
         save_tag_value(self, io)
         data = io.getvalue()
         if compressed:
-            gzio = StringIO()
+            gzio = BytesIO()
             gz = gzip.GzipFile(fileobj=gzio, mode='wb')
             gz.write(data)
             gz.close()
@@ -404,7 +399,7 @@ cdef class _TAG_Compound(TAG_Value):
             return data
 
         if isinstance(filename_or_buf, basestring):
-            f = file(filename_or_buf, "wb")
+            f = open(filename_or_buf, "wb")
             f.write(data)
         else:
             filename_or_buf.write(data)
@@ -429,7 +424,7 @@ cdef swab(void * vbuf, int nbytes):
 
 
 def gunzip(data):
-    return gzip.GzipFile(fileobj=StringIO(data)).read()
+    return gzip.GzipFile(fileobj=BytesIO(data)).read()
 
 
 def try_gunzip(data):
@@ -442,7 +437,7 @@ def try_gunzip(data):
 
 def load(filename="", buf=None):
     if filename:
-        buf = file(filename, "rb")
+        buf = open(filename, "rb")
 
     if hasattr(buf, "read"):
         buf = buf.read()
@@ -660,7 +655,8 @@ def hexdump(src, length=8):
 
 cdef cwrite(obj, char *buf, size_t len):
     #print "cwrite %s %s %d" % (map(ord, buf[:min(4, len)]), buf[:min(4, len)].decode('ascii', 'replace'), len)
-    return PycStringIO.cwrite(obj, buf, len)
+    # return PycStringIO.cwrite(obj, buf, len)
+    write_bytes(<bytesio*>obj, buf, len)    
 
 
 cdef save_tag_id(char tagID, object buf):
