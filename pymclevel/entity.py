@@ -4,9 +4,9 @@ Created on Jul 23, 2011
 @author: Rio
 '''
 from math import isnan
-
-import nbt
 from copy import deepcopy
+
+from .import nbt
 
 __all__ = ["Entity", "TileEntity"]
 

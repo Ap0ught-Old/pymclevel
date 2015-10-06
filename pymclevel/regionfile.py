@@ -5,8 +5,8 @@ import zlib
 
 from numpy import fromstring
 import time
-from mclevelbase import notclosing, RegionMalformed, ChunkNotPresent
-import nbt
+from .mclevelbase import notclosing, RegionMalformed, ChunkNotPresent
+from . import nbt
 
 log = logging.getLogger(__name__)
 
@@ -24,7 +24,7 @@ class MCRegionFile(object):
 
     @property
     def file(self):
-        openfile = lambda: file(self.path, "rb+")
+        openfile = lambda: open(self.path, "rb+")
         if MCRegionFile.holdFileOpen:
             if self._file is None:
                 self._file = openfile()
@@ -45,7 +45,7 @@ class MCRegionFile(object):
         self.regionCoords = regionCoords
         self._file = None
         if not os.path.exists(path):
-            file(path, "w").close()
+            open(path, "w").close()
 
         with self.file as f:
 
@@ -62,7 +62,7 @@ class MCRegionFile(object):
             offsetsData = f.read(self.SECTOR_BYTES)
             modTimesData = f.read(self.SECTOR_BYTES)
 
-            self.freeSectors = [True] * (filesize / self.SECTOR_BYTES)
+            self.freeSectors = [True] * (filesize // self.SECTOR_BYTES)
             self.freeSectors[0:2] = False, False
 
             self.offsets = fromstring(offsetsData, dtype='>u4')
@@ -225,7 +225,7 @@ class MCRegionFile(object):
 
         sectorNumber = offset >> 8
         sectorsAllocated = offset & 0xff
-        sectorsNeeded = (len(data) + self.CHUNK_HEADER_SIZE) / self.SECTOR_BYTES + 1
+        sectorsNeeded = (len(data) + self.CHUNK_HEADER_SIZE) // self.SECTOR_BYTES + 1
 
         if sectorsNeeded >= 256:
             raise ChunkTooBig("Chunk too big! %d bytes exceeds 1MB" % len(data))

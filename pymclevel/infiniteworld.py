@@ -20,16 +20,17 @@ import weakref
 import zlib
 import sys
 
-import blockrotation
-from box import BoundingBox
-from entity import Entity, TileEntity
-from faces import FaceXDecreasing, FaceXIncreasing, FaceZDecreasing, FaceZIncreasing
-from level import LightedChunk, EntityLevel, computeChunkHeightMap, MCLevel, ChunkBase
-from materials import alphaMaterials
-from mclevelbase import ChunkMalformed, ChunkNotPresent, exhaust, PlayerNotFound
-import nbt
 from numpy import array, clip, maximum, zeros
-from regionfile import MCRegionFile
+
+from . import blockrotation
+from .box import BoundingBox
+from .entity import Entity, TileEntity
+from .faces import FaceXDecreasing, FaceXIncreasing, FaceZDecreasing, FaceZIncreasing
+from .level import LightedChunk, EntityLevel, computeChunkHeightMap, MCLevel, ChunkBase
+from .materials import alphaMaterials
+from .mclevelbase import ChunkMalformed, ChunkNotPresent, exhaust, PlayerNotFound
+from . import nbt
+from .regionfile import MCRegionFile
 
 log = getLogger(__name__)
 
@@ -112,7 +113,7 @@ class AnvilChunkData(object):
         self.world = world
         self.root_tag = root_tag
         self.dirty = False
-
+        
         self.Blocks = zeros((16, 16, world.Height), 'uint16')
         self.Data = zeros((16, 16, world.Height), 'uint8')
         self.BlockLight = zeros((16, 16, world.Height), 'uint8')
@@ -1015,7 +1016,7 @@ class MCInfdevOldLevel(ChunkedLevelMixin, EntityLevel):
 
         self.Length = 0
         self.Width = 0
-        self.Height = 256
+        self.Height = 128
 
         self.playerTagCache = {}
         self.players = []
@@ -1114,7 +1115,7 @@ class MCInfdevOldLevel(ChunkedLevelMixin, EntityLevel):
 
         lockfile = self.worldFolder.getFilePath("session.lock")
         try:
-            (lock, ) = struct.unpack(">q", file(lockfile, "rb").read())
+            (lock, ) = struct.unpack(">q", open(lockfile, "rb").read())
         except struct.error:
             lock = -1
         if lock != self.initTime:
@@ -1220,7 +1221,7 @@ class MCInfdevOldLevel(ChunkedLevelMixin, EntityLevel):
     isInfinite = True
     parentWorld = None
     dimNo = 0
-    Height = 256
+    Height = 128
     _bounds = None
 
     # --- NBT Tag variables ---

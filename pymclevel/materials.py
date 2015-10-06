@@ -160,7 +160,7 @@ class MCMaterials(object):
 
             log.exception("Failed to read %s using pkg_resources. Trying %s instead." % (filename, path))
 
-            f = file(path)
+            f = open(path)
         try:
             log.info("Loading block info from %s", f)
             blockyaml = yaml.load(f)
@@ -299,7 +299,9 @@ HugeMushroomTypes = {
    "Stem": 10,
    "Top": 5,
 }
-from faces import FaceXDecreasing, FaceXIncreasing, FaceYIncreasing, FaceZDecreasing, FaceZIncreasing
+
+
+from .faces import FaceXDecreasing, FaceXIncreasing, FaceYIncreasing, FaceZDecreasing, FaceZIncreasing
 
 Red = (0xD0, 0x70)
 Brown = (0xE0, 0x70)

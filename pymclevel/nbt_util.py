@@ -1,6 +1,5 @@
-import nbt
-
 def nested_string(tag, indent_string="  ", indent=0):
+    from . import nbt
     result = ""
 
     if tag.tagID == nbt.TAG_COMPOUND:

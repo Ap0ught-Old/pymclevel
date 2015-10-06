@@ -3,10 +3,10 @@ import logging
 log = logging.getLogger(__name__)
 
 import numpy
-from box import BoundingBox, Vector
-from mclevelbase import exhaust
-import materials
-from entity import Entity, TileEntity
+from .box import BoundingBox, Vector
+from .mclevelbase import exhaust
+from . import materials
+from .entity import Entity, TileEntity
 
 
 def convertBlocks(destLevel, sourceLevel, blocks, blockData):

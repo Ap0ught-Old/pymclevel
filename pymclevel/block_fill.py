@@ -1,13 +1,13 @@
 import logging
-import materials
+from . import materials
 
 log = logging.getLogger(__name__)
 
 import numpy
 
-from mclevelbase import exhaust
-import blockrotation
-from entity import TileEntity
+from .mclevelbase import exhaust
+from . import blockrotation
+from .entity import TileEntity
 
 def blockReplaceTable(blocksToReplace):
     blocktable = numpy.zeros((materials.id_limit, 16), dtype='bool')

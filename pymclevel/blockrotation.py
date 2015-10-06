@@ -1,5 +1,5 @@
-import materials
-from materials import alphaMaterials
+from . import materials
+from .materials import alphaMaterials
 from numpy import arange, zeros
 
 

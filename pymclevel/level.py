@@ -4,16 +4,16 @@ Created on Jul 22, 2011
 @author: Rio
 '''
 
-import blockrotation
-from box import BoundingBox
+from . import blockrotation
+from .box import BoundingBox
 from collections import defaultdict
-from entity import Entity, TileEntity
+from .entity import Entity, TileEntity
 import itertools
 from logging import getLogger
-import materials
+from . import materials
 from math import floor
-from mclevelbase import ChunkMalformed, ChunkNotPresent, exhaust
-import nbt
+from .mclevelbase import ChunkMalformed, ChunkNotPresent, exhaust
+from . import nbt
 from numpy import argmax, swapaxes, zeros, zeros_like
 import os.path
 
@@ -354,7 +354,7 @@ class MCLevel(object):
 
     # --- Fill and Replace ---
 
-    from block_fill import fillBlocks, fillBlocksIter
+    from .block_fill import fillBlocks, fillBlocksIter
 
     # --- Transformations ---
     def rotateLeft(self):
@@ -379,7 +379,7 @@ class MCLevel(object):
 
     # --- Copying ---
 
-    from block_copy import copyBlocksFrom, copyBlocksFromIter
+    from .block_copy import copyBlocksFrom, copyBlocksFromIter
 
 
     def saveInPlace(self):

@@ -91,7 +91,7 @@ class TAG_Value(object):
         return '<%s name="%s" value=%r>' % (str(self.__class__.__name__), self.name, self.value)
 
     def write_tag(self, buf):
-        buf.write(chr(self.tagID))
+        buf.write(struct.pack('>c', bytes([self.tagID])))
 
     def write_name(self, buf):
         if self.name is not None:
@@ -303,7 +303,7 @@ class TAG_Compound(TAG_Value, collections.MutableMapping):
         if self.name is None:
             self.name = ''
 
-        buf = StringIO()
+        buf = BytesIO()
         self.write_tag(buf)
         self.write_name(buf)
         self.write_value(buf)
@@ -331,7 +331,7 @@ class TAG_Compound(TAG_Value, collections.MutableMapping):
             tag.write_name(buf)
             tag.write_value(buf)
 
-        buf.write('\x00')
+        buf.write(bytes([0]))
 
     # --- collection functions ---
 
@@ -431,7 +431,7 @@ class TAG_List(TAG_Value, collections.MutableSequence):
 
 
     def write_value(self, buf):
-       buf.write(chr(self.list_type))
+       buf.write(struct.pack('>c', bytes([self.list_type])))
        buf.write(TAG_Int.fmt.pack(len(self.value)))
        for i in self.value:
            i.write_value(buf)
@@ -537,7 +537,7 @@ def _load_buffer(buf):
 
 __all__ = [a.__name__ for a in tag_classes.values()] + ['load', 'gunzip']
 
-import nbt_util
+from . import nbt_util
 
 TAG_Value.__str__ = nbt_util.nested_string
 
