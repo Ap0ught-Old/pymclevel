@@ -40,10 +40,30 @@ import zlib
 
 from io import BytesIO
 from cpython cimport PyTypeObject, PyObject_TypeCheck, PyUnicode_DecodeUTF8, PyList_Append
+from libc.string import memcpy
+
 import numpy
 
+
 cdef extern:
-    struct bytesio
+    # NOTE: Cython doesn't even let structs derive from Python objects or for field members,
+    # so we have to fake each with void* and expand the PyObject_HEAD macro manually for size.
+    struct bytesio:
+        # PyObject_HEAD
+        void *_ob_next
+        void *_ob_prev
+        Py_ssize_t ob_refcnt
+        void *ob_type
+        # PyObject_END
+
+        char *buf
+        Py_ssize_t pos
+        Py_ssize_t string_size
+        size_t buf_size
+        void *dict
+        void *weakreflist
+        Py_ssize_t exports
+
     Py_ssize_t write_bytes(bytesio *self, const char *bytes, Py_ssize_t len)
 
 
@@ -654,9 +674,22 @@ def hexdump(src, length=8):
 
 
 cdef cwrite(obj, char *buf, size_t len):
-    #print "cwrite %s %s %d" % (map(ord, buf[:min(4, len)]), buf[:min(4, len)].decode('ascii', 'replace'), len)
-    # return PycStringIO.cwrite(obj, buf, len)
-    write_bytes(<bytesio*>obj, buf, len)    
+    cdef bytesio* self = <bytesio*>obj; 
+
+    # Ported from write_bytes in _io.c from Python 3.4.    
+    assert self.buf != None
+    assert self.pos >= 0
+    assert len >= 0
+    
+    # Can't resize and can't seek.
+    assert self.pos + len <= self.buf_size
+    assert self.pos <= self.string_size
+
+    memcpy(self.buf + self.pos, bytes, len);
+    self.pos += len
+
+    if self.string_size < self.pos:
+        self.string_size = self.pos;
 
 
 cdef save_tag_id(char tagID, object buf):
